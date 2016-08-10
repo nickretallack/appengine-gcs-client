@@ -38,6 +38,7 @@ except ImportError:
   from google.appengine.api import urlfetch
   from google.appengine.ext import ndb
 
+from google.appengine.api import app_identity
 
 
 def _get_storage_api(retry_params, account_id=None):
@@ -59,7 +60,9 @@ def _get_storage_api(retry_params, account_id=None):
   api = _StorageApi(_StorageApi.full_control_scope,
                     service_account_id=account_id,
                     retry_params=retry_params)
-  if common.local_run() and not common.get_access_token():
+
+  if (common.local_run() and not common.get_access_token()
+      and not app_identity.get_service_account_name()):
     api.api_url = common.local_api_url()
   if common.get_access_token():
     api.token = common.get_access_token()
